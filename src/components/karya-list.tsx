@@ -1,18 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Clock, ArrowDownAZ, User, History } from "lucide-react";
 import { KaryaCard } from "@/components/karya-card";
-import { Input } from "@/components/ui/input";
 import type { Karya } from "@/lib/types";
 
 type SortKey = "newest" | "oldest" | "title" | "participant";
 
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: "newest", label: "Terbaru" },
-  { value: "oldest", label: "Terlama" },
-  { value: "title", label: "Judul (A–Z)" },
-  { value: "participant", label: "Peserta (A–Z)" },
+const SORT_OPTIONS: {
+  value: SortKey;
+  label: string;
+  Icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  { value: "newest", label: "Terbaru", Icon: Clock },
+  { value: "oldest", label: "Terlama", Icon: History },
+  { value: "title", label: "Judul A–Z", Icon: ArrowDownAZ },
+  { value: "participant", label: "Peserta A–Z", Icon: User },
 ];
 
 function sortKarya(list: Karya[], key: SortKey): Karya[] {
@@ -59,58 +62,67 @@ export function KaryaList({ karya }: { karya: Karya[] }) {
 
   return (
     <>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
+      <div className="mb-4">
+        <label
+          htmlFor="search"
+          className="search-pill mx-auto flex h-12 w-full max-w-2xl items-center gap-3 px-5"
+        >
+          <Search className="size-4 shrink-0 text-muted-foreground" />
+          <input
+            id="search"
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari judul atau nama peserta..."
-            className="pl-9"
+            placeholder="Cari judul atau nama peserta…"
+            className="flex-1 bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="sort"
-            className="text-sm text-muted-foreground whitespace-nowrap"
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="text-xs font-medium text-[color:var(--google-blue)] hover:underline"
+            >
+              Bersihkan
+            </button>
+          )}
+        </label>
+      </div>
+
+      <div
+        className="mb-8 flex flex-wrap items-center justify-center gap-2"
+        role="tablist"
+        aria-label="Urutkan"
+      >
+        {SORT_OPTIONS.map(({ value, label, Icon }) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={sort === value}
+            data-active={sort === value}
+            onClick={() => setSort(value)}
+            className="chip"
           >
-            Urutkan
-          </label>
-          <select
-            id="sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <Icon className="size-3.5" />
+            {label}
+          </button>
+        ))}
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed py-20 text-center">
-          <p className="text-muted-foreground">
+        <div className="rounded-3xl border border-dashed border-border surface-container py-20 text-center">
+          <p className="text-base text-muted-foreground">
             {karya.length === 0
-              ? "Belum ada karya. Jadilah yang pertama!"
-              : `Tidak ada karya cocok dengan "${query}".`}
+              ? "Belum ada karya. Jadilah yang pertama."
+              : `Tidak ada karya yang cocok dengan "${query}".`}
           </p>
         </div>
       ) : (
-        <>
-          <p className="mb-3 text-xs text-muted-foreground">
-            {filtered.length} dari {karya.length} karya
-          </p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((k) => (
-              <KaryaCard key={k.id} karya={k} />
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((k, i) => (
+            <KaryaCard key={k.id} karya={k} index={i} />
+          ))}
+        </div>
       )}
     </>
   );

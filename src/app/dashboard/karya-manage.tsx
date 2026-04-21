@@ -3,14 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Pencil, Trash2, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -39,8 +36,8 @@ export function KaryaManage({ karya }: { karya: Karya }) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border bg-card">
-        <div className="aspect-video w-full bg-muted">
+      <article className="elev-1 overflow-hidden rounded-3xl border border-border bg-card">
+        <div className="aspect-[16/9] w-full overflow-hidden bg-[color:var(--paper-soft)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={thumbnailUrl(karya.url)}
@@ -48,75 +45,101 @@ export function KaryaManage({ karya }: { karya: Karya }) {
             className="size-full object-cover object-top"
           />
         </div>
-        <div className="p-5">
-          <h2 className="text-lg font-semibold tracking-tight">{karya.title}</h2>
-          <p className="text-sm text-muted-foreground">{karya.participant_name}</p>
-          <a
-            href={karya.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
-          >
-            {karya.url}
-            <ExternalLink className="size-3.5" />
-          </a>
-
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button onClick={() => setEditOpen(true)} size="sm">
-              <Pencil className="size-4" />
-              Edit
-            </Button>
-            <Button
-              onClick={() => setConfirmOpen(true)}
-              size="sm"
-              variant="destructive"
+        <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-[1fr_auto] sm:p-8">
+          <div>
+            <span className="eyebrow">Karya terdaftar</span>
+            <h2 className="mt-1 font-display text-2xl font-medium tracking-tight sm:text-3xl">
+              <span className="gemini-text">{karya.title}</span>
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              oleh {karya.participant_name}
+            </p>
+            <a
+              href={karya.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--google-blue)] hover:underline"
             >
-              <Trash2 className="size-4" />
+              {prettyHost(karya.url)}
+              <ArrowUpRight className="size-3.5" />
+            </a>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
+            <button
+              onClick={() => setEditOpen(true)}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-background px-5 text-sm font-medium text-foreground transition-colors hover:bg-[color:var(--paper-soft)]"
+            >
+              <Pencil className="size-3.5" />
+              Edit
+            </button>
+            <button
+              onClick={() => setConfirmOpen(true)}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-[color:var(--google-red)]/30 bg-background px-5 text-sm font-medium text-[color:var(--google-red)] transition-colors hover:bg-[color:var(--google-red)]/10"
+            >
+              <Trash2 className="size-3.5" />
               Hapus
-            </Button>
+            </button>
           </div>
         </div>
-      </div>
+      </article>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Edit karya</DialogTitle>
+            <DialogTitle className="font-display text-2xl font-medium">
+              Edit karya
+            </DialogTitle>
             <DialogDescription>
-              Perbarui detail karya Anda.
+              Perbarui detail karya Anda di showcase.
             </DialogDescription>
           </DialogHeader>
-          <KaryaForm
-            mode="edit"
-            karya={karya}
-            onDone={() => setEditOpen(false)}
-          />
+          <div className="mt-2">
+            <KaryaForm
+              mode="edit"
+              karya={karya}
+              onDone={() => setEditOpen(false)}
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus karya?</DialogTitle>
+            <DialogTitle className="font-display text-2xl font-medium">
+              Hapus karya?
+            </DialogTitle>
             <DialogDescription>
               Tindakan ini tidak dapat dibatalkan. Karya Anda akan dihapus
               permanen dari showcase.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <DialogClose
-              render={<Button variant="outline">Batal</Button>}
-            />
-            <Button
-              variant="destructive"
+          <div className="mt-4 flex justify-end gap-2">
+            <button
+              onClick={() => setConfirmOpen(false)}
+              disabled={pending}
+              className="inline-flex h-10 items-center rounded-full px-5 text-sm font-medium text-[color:var(--google-blue)] hover:bg-[color:var(--accent)]"
+            >
+              Batal
+            </button>
+            <button
               onClick={onDelete}
               disabled={pending}
+              className="inline-flex h-10 items-center rounded-full bg-[color:var(--google-red)] px-5 text-sm font-medium text-white transition-colors hover:brightness-110 disabled:opacity-60"
             >
-              {pending ? "Menghapus..." : "Ya, hapus"}
-            </Button>
-          </DialogFooter>
+              {pending ? "Menghapus…" : "Ya, hapus"}
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
   );
+}
+
+function prettyHost(url: string) {
+  try {
+    return new URL(url).host.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }
