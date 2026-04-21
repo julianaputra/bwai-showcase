@@ -1,5 +1,5 @@
 import { Navbar } from "@/components/navbar";
-import { KaryaCard } from "@/components/karya-card";
+import { KaryaList } from "@/components/karya-list";
 import { createClient } from "@/lib/supabase/server";
 import type { Karya } from "@/lib/types";
 
@@ -28,19 +28,7 @@ export default async function Home() {
           </p>
         </section>
 
-        {list.length === 0 ? (
-          <div className="rounded-xl border border-dashed py-20 text-center">
-            <p className="text-muted-foreground">
-              Belum ada karya. Jadilah yang pertama!
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((k) => (
-              <KaryaCard key={k.id} karya={k} />
-            ))}
-          </div>
-        )}
+        <KaryaList karya={list} />
       </main>
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">
         BwAI Showcase · Workshop Build with AI
