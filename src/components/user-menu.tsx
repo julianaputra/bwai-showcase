@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -53,14 +54,16 @@ export function UserMenu({ email, name, avatarUrl }: Props) {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{name}</span>
-            <span className="truncate text-xs text-muted-foreground">
-              {email}
-            </span>
-          </div>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{name}</span>
+              <span className="truncate text-xs text-muted-foreground">
+                {email}
+              </span>
+            </div>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href="/dashboard" />}>
           <LayoutDashboard className="size-4" />
