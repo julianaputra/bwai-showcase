@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BwAI Showcase
 
-## Getting Started
+Showcase website karya peserta Build with AI Workshop. Login Google, submit satu karya per peserta, tampil di halaman utama dengan thumbnail preview.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router, Turbopack)
+- Tailwind CSS v4
+- shadcn/ui (base-ui)
+- Supabase (Auth + Postgres + RLS)
+
+## Setup
+
+### 1. Install dependensi
+
+```bash
+npm install
+```
+
+### 2. Buat Supabase project
+
+1. Buka [supabase.com](https://supabase.com) → **New project**.
+2. Setelah project siap, buka **SQL Editor** → jalankan isi `supabase/schema.sql`.
+3. Buka **Settings → Data API** → salin `Project URL` dan `anon public key`.
+
+### 3. Konfigurasi Google OAuth
+
+1. Di Supabase dashboard: **Authentication → Providers → Google** → enable.
+2. Ikuti link ke Google Cloud Console, buat OAuth Client ID:
+   - Application type: **Web application**
+   - Authorized JavaScript origins: `http://localhost:3000` (dan domain produksi Anda)
+   - Authorized redirect URIs: `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
+3. Salin **Client ID** dan **Client Secret** ke Supabase Google provider → Save.
+4. Di Supabase **Authentication → URL Configuration**:
+   - Site URL: `http://localhost:3000`
+   - Additional redirect URLs: `http://localhost:3000/auth/callback` (dan URL produksi: `https://YOUR_DOMAIN/auth/callback`)
+
+### 4. Environment variables
+
+Copy `.env.local.example` → `.env.local`, isi dengan nilai dari langkah 2:
+
+```bash
+cp .env.local.example .env.local
+```
+
+### 5. Jalankan dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Struktur
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── page.tsx              # Homepage (list karya)
+│   ├── login/                # Google sign-in
+│   ├── auth/callback/        # OAuth callback
+│   └── dashboard/            # CRUD karya (auth-only)
+├── components/
+│   ├── navbar.tsx
+│   ├── karya-card.tsx
+│   ├── user-menu.tsx
+│   └── ui/                   # shadcn components
+├── lib/
+│   ├── supabase/             # Browser + server clients
+│   └── types.ts              # Karya type + thumbnail helper
+└── proxy.ts                  # Session refresh (Next 16 = proxy, dulu middleware)
 
-## Learn More
+supabase/
+└── schema.sql                # Tabel + RLS policies
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Thumbnail
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pakai `s.wordpress.com/mshots` (gratis, tanpa API key). Pertama kali URL di-request, mshots antri generate — muncul placeholder. Request ulang setelah beberapa detik menghasilkan screenshot final.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Catatan Next.js 16
 
-## Deploy on Vercel
+- File `middleware.ts` direname jadi `proxy.ts`, function `proxy()`.
+- `cookies()` dan `params` kini async (pakai `await`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Aturan bisnis
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Satu user = satu karya (unique `user_id` di DB).
+- RLS: semua boleh read, hanya owner yang bisa insert/update/delete miliknya.
