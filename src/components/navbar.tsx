@@ -22,6 +22,7 @@ export async function Navbar() {
 
         <nav className="flex items-center gap-1 sm:gap-2">
           <NavLink href="/undian">Undian</NavLink>
+          <NavLink href="/kesan">Kesan</NavLink>
           {user ? (
             <>
               <NavLink href="/dashboard">Dashboard</NavLink>

@@ -41,7 +41,7 @@ export default async function Home() {
             className="rise mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
             style={{ animationDelay: "120ms" }}
           >
-            Koleksi website yang dibangun peserta Build with AI Workshop.
+            Koleksi website yang dibangun peserta Workshop Build with AI Julian.
             Jelajahi, cari, dan dukung karya teman-temanmu.
           </p>
 
@@ -64,32 +64,6 @@ export default async function Home() {
             >
               Lihat materi
             </a>
-          </div>
-
-          <div
-            className="rise mt-14 grid w-full max-w-2xl grid-cols-4 gap-0 overflow-hidden rounded-2xl border border-border bg-card text-center"
-            style={{ animationDelay: "340ms" }}
-          >
-            {[
-              { label: "Karya", value: list.length, color: "var(--google-blue)" },
-              { label: "Peserta", value: new Set(list.map((k) => k.participant_name)).size, color: "var(--google-red)" },
-              { label: "Domain", value: uniqueHosts(list), color: "var(--google-yellow)" },
-              { label: "Minggu", value: "1", color: "var(--google-green)" },
-            ].map((s, i) => (
-              <div
-                key={s.label}
-                className={`flex flex-col gap-1 py-5 ${i > 0 ? "border-l border-border" : ""}`}
-              >
-                <span
-                  className="mx-auto h-1 w-8 rounded-full"
-                  style={{ background: s.color }}
-                />
-                <span className="mt-2 font-display text-2xl font-medium tabular-nums">
-                  {s.value}
-                </span>
-                <span className="text-xs text-muted-foreground">{s.label}</span>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -160,7 +134,7 @@ function uniqueHosts(list: Karya[]): number {
   for (const k of list) {
     try {
       hosts.add(new URL(k.url).host.replace(/^www\./, ""));
-    } catch {}
+    } catch { }
   }
   return hosts.size;
 }
