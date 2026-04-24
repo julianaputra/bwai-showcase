@@ -56,12 +56,14 @@ export default async function Home() {
               <GeminiSparkle gradient={false} className="size-4 text-white" />
               Submit karya
             </Link>
-            <Link
-              href="/undian"
+            <a
+              href="https://docs.google.com/presentation/d/1aol-GCASmsT7v_jNkMzZ-q1dlyo2UQICVDb6SjKOC5A/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-background px-7 text-sm font-medium text-foreground transition-colors hover:bg-[color:var(--paper-soft)]"
             >
-              Masuk undian
-            </Link>
+              Lihat materi
+            </a>
           </div>
 
           <div
