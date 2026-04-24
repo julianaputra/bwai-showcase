@@ -11,6 +11,7 @@ export default async function KesanPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   const { data } = await supabase.from("kesan").select("word");
 
   const freq: Record<string, number> = {};
@@ -20,6 +21,16 @@ export default async function KesanPage() {
   }
   const words = Object.entries(freq).map(([word, count]) => ({ word, count }));
   const totalSubmissions = data?.length ?? 0;
+
+  // Fetch this user's existing submission
+  let initialWords: string[] = [];
+  if (user) {
+    const { data: myRows } = await supabase
+      .from("kesan")
+      .select("word")
+      .eq("user_id", user.id);
+    initialWords = (myRows ?? []).map((r) => r.word);
+  }
 
   return (
     <>
@@ -51,7 +62,7 @@ export default async function KesanPage() {
         </div>
 
         <div className="mb-8">
-          <KesanForm isLoggedIn={!!user} />
+          <KesanForm isLoggedIn={!!user} initialWords={initialWords} />
         </div>
 
         <WordCloud words={words} />

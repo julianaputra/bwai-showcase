@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export type SubmitKesanResult = { ok: true } | { ok: false; error: string };
+export type UpsertKesanResult = { ok: true } | { ok: false; error: string };
 
-export async function submitKesan(
+export async function upsertKesan(
   formData: FormData
-): Promise<SubmitKesanResult> {
+): Promise<UpsertKesanResult> {
   const rawWords = [
     formData.get("word1"),
     formData.get("word2"),
@@ -35,11 +35,21 @@ export async function submitKesan(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Kamu harus login untuk mengirim kesan." };
 
-  const { error } = await supabase
+  // Delete existing words for this user, then insert new ones
+  const { error: deleteError } = await supabase
     .from("kesan")
-    .insert(rawWords.map((word) => ({ word })));
+    .delete()
+    .eq("user_id", user.id);
 
-  if (error) {
+  if (deleteError) {
+    return { ok: false, error: "Gagal memperbarui. Coba lagi." };
+  }
+
+  const { error: insertError } = await supabase
+    .from("kesan")
+    .insert(rawWords.map((word) => ({ word, user_id: user.id })));
+
+  if (insertError) {
     return { ok: false, error: "Gagal menyimpan. Coba lagi." };
   }
 

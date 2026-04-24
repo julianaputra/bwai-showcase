@@ -25,14 +25,16 @@ create trigger karya_set_updated_at
   before update on public.karya
   for each row execute function public.set_updated_at();
 
--- Kesan (workshop impressions — open to all, no auth required)
+-- Kesan (workshop impressions — one submission per authenticated user, editable)
 create table if not exists public.kesan (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
   word text not null check (char_length(word) between 1 and 30),
   created_at timestamptz not null default now()
 );
 
 create index if not exists kesan_word_idx on public.kesan (word);
+create index if not exists kesan_user_id_idx on public.kesan (user_id);
 
 alter table public.kesan enable row level security;
 
@@ -42,7 +44,11 @@ create policy kesan_select_all on public.kesan
 
 drop policy if exists kesan_insert_all on public.kesan;
 create policy kesan_insert_all on public.kesan
-  for insert with check (auth.uid() is not null);
+  for insert with check (auth.uid() is not null and auth.uid() = user_id);
+
+drop policy if exists kesan_delete_own on public.kesan;
+create policy kesan_delete_own on public.kesan
+  for delete using (auth.uid() = user_id);
 
 -- RLS
 alter table public.karya enable row level security;
