@@ -18,15 +18,15 @@ export function KaryaForm(props: Props) {
   const initial =
     props.mode === "edit"
       ? {
-          title: props.karya.title,
-          url: props.karya.url,
-          participant_name: props.karya.participant_name,
-        }
+        title: props.karya.title,
+        url: props.karya.url,
+        participant_name: props.karya.participant_name,
+      }
       : {
-          title: "",
-          url: "",
-          participant_name: props.defaultName ?? "",
-        };
+        title: "",
+        url: "",
+        participant_name: props.defaultName ?? "",
+      };
 
   function onSubmit(form: FormData) {
     setError(null);
@@ -53,7 +53,7 @@ export function KaryaForm(props: Props) {
         hint="Maks 120 karakter"
         name="title"
         defaultValue={initial.title}
-        placeholder="Resep Masakan Nusantara"
+        placeholder="My Portfolio Gweh"
         maxLength={120}
         required
       />
